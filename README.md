@@ -44,7 +44,11 @@ ft_defaults
 ## MATLAB Analysis
 
 * DEMO Spike-phase coupling: the script `spc_demo.m` is designed to illustrate the computation of the time-resolved spike-phase coupling between 2 exemplary ECoG channels and 2 exemplary neurons contained in intracranial_data.mat.
-* MAIN ANALYSIS: In this repo, `NWB_SBCAT_analysis_demo_main.m`, is designed to analyze the released dataset and to reproduce select figures & metrics noted in Daume et. al. 2024. It can calculate several metrics related to behavior (reaction time, accuracy), spike sorting, and single-unit (SU) activity during the task.
+* MAIN ANALYSIS: `Figure_02.m, Figure_03.m, Figure_04.m and Figure_05.m` are designed to analyze the minimal dataset and to reproduce  figures & metrics noted in the manuscript.
+  - `Figure_02.m`: This figure describes the properties of the spike-phase coupling interaction between Subthalamic Nucleus and Cortex during speech production. 
+  - `Figure_03.m`: This figure describes the spatial distribution of the spike-phase coupling on the Cortex.
+  - `Figure_04.m`: This figure describes the spatial distribution of the spike-phase coupling on the Subthalamic Nucleus.
+  - `Figure_05.m`: This figure illustrates the error analysis contained in the manuscript.
 
 If you encounter any problems, please report them as issues in the repository or send an [email](mailto:mvissani@mgh.harvard.edu).
 This repository has been tested successfully in MATLAB versions 2022a and 2023a.
