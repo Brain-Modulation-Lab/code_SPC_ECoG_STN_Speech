@@ -63,7 +63,7 @@ The external folder in the repo contains other libraries:
   - `Figure_05.m`: This figure illustrates the error analysis contained in the manuscript. To reduce computational effort, please make sure that the folder permutation_avgmaps is in your data folder. (~10 min)
 
 If you encounter any problems, please report them as issues in the repository or send an [email](mailto:mvissani@mgh.harvard.edu).
-This repository has been tested successfully in MATLAB versions 2022a and 2023a.
+This repository has been tested successfully in MATLAB versions 2022a and 2023a on MacOS.
 
 ## Contributors
 * [Matteo Vissani](mailto:mvissani@mgh.harvard.edu)
