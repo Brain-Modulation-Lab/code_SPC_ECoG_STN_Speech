@@ -36,7 +36,7 @@ ft_defaults;     % Initialize FieldTrip defaults
 bml_defaults;    % Initialize BML toolbox defaults
 
 % Get configuration settings (edit set_configs.m for customization)
-cfg = set_configs;
+cfg = set_configs('default');
 
 % Display script start time
 fprintf(" Script starts at %s \n", datetime("now"))
