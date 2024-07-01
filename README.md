@@ -1,5 +1,7 @@
 # Sample code for: Spike-phase coupling of subthalamic neurons to posterior opercular cortex predicts speech sound accuracy
 
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit)
+[![Generic badge](https://img.shields.io/badge/release-1.0.0-green.svg)](https://github.com/rutishauserlab/paper_SPC_ECoG_STN_Speech/releases/tag/v1.0.0)
 
 
 ## Introduction
