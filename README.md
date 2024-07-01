@@ -41,6 +41,15 @@ bml_defaults
 ft_defaults
 ```
 
+## MATLAB Analysis
+
+* DEMO Spike-phase coupling: the script `spc_demo.m` is designed to illustrate the computation of the time-resolved spike-phase coupling between 2 exemplary ECoG channels and 2 exemplary neurons contained in intracranial_data.mat.
+* MAIN ANALYSIS: In this repo, `NWB_SBCAT_analysis_demo_main.m`, is designed to analyze the released dataset and to reproduce select figures & metrics noted in Daume et. al. 2024. It can calculate several metrics related to behavior (reaction time, accuracy), spike sorting, and single-unit (SU) activity during the task.
+
+If you encounter any problems, please report them as issues in the repository or send an [email](mailto:mvissani@mgh.harvard.edu).
+This repository has been tested successfully in MATLAB versions 2022a and 2023a.
+
+
 ## Contributors
 * [Matteo Vissani](mailto:mvissani@mgh.harvard.edu)
 
@@ -49,3 +58,6 @@ ft_defaults
 
 ## Funding
 This work was funded by the National Institute of Health (BRAIN Initiative), through grants U01NS098969, U01NS117836 and R01NS110424.
+
+# License
+This project is covered under the **MIT License**.
