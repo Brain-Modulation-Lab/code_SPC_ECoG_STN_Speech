@@ -18,5 +18,8 @@ Abstract of the paper:
 ## Contributors
 * [Matteo Vissani](mailto:mvissani@mgh.harvard.edu)
 
+>Citation: [INSERT DOI HERE]
+
+
 ## Funding
 This work was funded by the National Institute of Health (BRAIN Initiative), through grants U01NS098969, U01NS117836 and R01NS110424.
