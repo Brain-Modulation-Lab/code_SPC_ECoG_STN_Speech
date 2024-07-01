@@ -13,6 +13,17 @@ Abstract of the paper:
   <img width="700" height="400" src="https://github.com/Brain-Modulation-Lab/paper_SPC_ECoG_STN_Speech/blob/main/image/Figure1.png">
 </p>
 
+## Installation (Code)
+
+This repository can be downloaded by entering the following commands:
+```
+git clone https://github.com/Brain-Modulation-Lab/paper_SPC_ECoG_STN_Speech.git
+cd paper_SPC_ECoG_STN_Speech
+```
+
+## Minimal Dataset 
+
+The minimum dataset required to run the repository can be downloaded in [Zenodo](https://doi.org/10.1101/2023.10.18.562969):
 
 
 ## Contributors
