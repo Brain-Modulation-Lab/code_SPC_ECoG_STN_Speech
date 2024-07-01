@@ -10,21 +10,21 @@ Abstract of the paper:
 >Speech provides a rich context for understanding how cortical interactions with the basal ganglia contribute to unique human behaviors, but opportunities for direct intracranial recordings across cortical-basal ganglia networks are rare. We recorded electrocorticographic signals in the cortex synchronously with single units in the basal ganglia during awake neurosurgeries where subjects spoke syllable repetitions. We discovered that individual STN neurons have transient (200ms) spike-phase coupling (SPC) events with multiple cortical regions. The spike timing of STN neurons was coordinated with the phase of theta-alpha oscillations in the posterior supramarginal and superior temporal gyrus during speech planning and production. Speech sound errors occurred when this STN-cortical interaction was delayed. Our results suggest that the STN supports mechanisms of speech planning and auditory-sensorimotor integration during speech production that are required to achieve high fidelity of the phonological and articulatory representation of the target phoneme. These findings establish a framework for understanding cortical-basal ganglia interaction in other human behaviors, and additionally indicate that firing-rate based models are insufficient for explaining basal ganglia circuit behavior.
 
 <p align="center">
-  <img width="700" height="400" src="https://github.com/Brain-Modulation-Lab/paper_SPC_ECoG_STN_Speech/blob/main/image/Figure1.png">
+  <img width="700" height="400" src="https://github.com/Brain-Modulation-Lab/code_SPC_ECoG_STN_Speech/blob/main/image/Figure1.png">
 </p>
 
 ## Installation (Code)
 
 This repository can be downloaded by entering the following commands:
 ```
-git clone https://github.com/Brain-Modulation-Lab/paper_SPC_ECoG_STN_Speech.git
-cd paper_SPC_ECoG_STN_Speech
+git clone https://github.com/Brain-Modulation-Lab/code_SPC_ECoG_STN_Speech.git
+cd code_SPC_ECoG_STN_Speech
 ```
 
 ## Minimal Dataset 
 
 The minimum dataset required to run the repository can be downloaded in [Zenodo](https://doi.org/10.5281/zenodo.12610957):
-'\
+* To run spc_demo.m you need to copy the file SPC_ECoG_STN_Speech/demos/intracranial-data-examples/intracranial_data.mat in code_SPC_ECoG_STN_Speech/demos/intracranial-data-examples
 
 
 ## Contributors
