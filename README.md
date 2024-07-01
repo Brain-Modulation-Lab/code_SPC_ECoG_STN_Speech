@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit)
 [![Generic badge](https://img.shields.io/badge/release-1.0.0-green.svg)](https://github.com/rutishauserlab/paper_SPC_ECoG_STN_Speech/releases/tag/v1.0.0)
-
+[![Generic badge](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.10494534-orange.svg)](https://doi.org/10.1101/2023.10.18.562969)
 ## Introduction
 This repository contains the code and the preprocessed dataset for the preprint [Vissani et al 2024](https://doi.org/10.1101/2023.10.18.562969) "Spike-phase coupling of subthalamic neurons to posterior opercular cortex predicts speech sound accuracy". The full raw dataset is hosted in the [Data Archive BRAIN Initiative](https://dabi.loni.usc.edu/dsi/1U01NS098969) and is available upon request.
 
@@ -14,3 +14,9 @@ Abstract of the paper:
 </p>
 
 
+
+## Contributors
+* [Matteo Vissani](mailto:mvissani@mgh.harvard.edu)
+
+## Funding
+This work was funded by the National Institute of Health (BRAIN Initiative), through grants U01NS098969, U01NS117836 and R01NS110424.
