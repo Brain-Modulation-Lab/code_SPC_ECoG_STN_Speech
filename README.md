@@ -40,6 +40,10 @@ After that just run these commands in MATLAB to manage dependencies:
 bml_defaults
 ft_defaults
 ```
+The external folder in the repo contains other libraries:
+* [Circstat](https://github.com/circstat/circstat-matlab): toolbox to analyze circular data
+* [RainCloud](https://github.com/RainCloudPlots/RainCloudPlots): toolbox to visualize data distributions.
+* [PERMUTOOLS](https://github.com/mickcrosse/PERMUTOOLS/tree/master): toolbox to implement permutation-based statistics.
 
 ## MATLAB Analysis
 
