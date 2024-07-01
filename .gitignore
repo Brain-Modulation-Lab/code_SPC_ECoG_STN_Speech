@@ -2,4 +2,4 @@
 *.csv
 *.node
 *.txt
-**/.DS_Store
+.DS_Store
