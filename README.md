@@ -45,14 +45,13 @@ ft_defaults
 
 * DEMO Spike-phase coupling: the script `spc_demo.m` is designed to illustrate the computation of the time-resolved spike-phase coupling between 2 exemplary ECoG channels and 2 exemplary neurons contained in intracranial_data.mat.
 * MAIN ANALYSIS: `Figure_02.m, Figure_03.m, Figure_04.m and Figure_05.m` are designed to analyze the minimal dataset and to reproduce  figures & metrics noted in the manuscript.
-  - `Figure_02.m`: This figure describes the properties of the spike-phase coupling interaction between Subthalamic Nucleus and Cortex during speech production. 
+  - `Figure_02.m`: This figure describes the properties of the spike-phase coupling interaction between Subthalamic Nucleus and Cortex during speech production. To reduce computational effort, please make sure that the folder permutation_avgmaps is in your data folder. 
   - `Figure_03.m`: This figure describes the spatial distribution of the spike-phase coupling on the Cortex.
   - `Figure_04.m`: This figure describes the spatial distribution of the spike-phase coupling on the Subthalamic Nucleus.
-  - `Figure_05.m`: This figure illustrates the error analysis contained in the manuscript.
+  - `Figure_05.m`: This figure illustrates the error analysis contained in the manuscript. To reduce computational effort, please make sure that the folder permutation_avgmaps is in your data folder. 
 
 If you encounter any problems, please report them as issues in the repository or send an [email](mailto:mvissani@mgh.harvard.edu).
 This repository has been tested successfully in MATLAB versions 2022a and 2023a.
-
 
 ## Contributors
 * [Matteo Vissani](mailto:mvissani@mgh.harvard.edu)
