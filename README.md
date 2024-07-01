@@ -33,7 +33,7 @@ The minimum dataset `SPC_ECoG_STN_Speech` required to run the repository can be 
 The code depends on these repositories:
 
 * [fieldtrip](https://www.fieldtriptoolbox.org/): toolbox to analyze electrophysiological data
-* [bml](https://github.com/Brain-Modulation-Lab/bml): fieldtrip wrapper developed by the BrainModulation Lab.
+* [bml](https://github.com/Brain-Modulation-Lab/bml): fieldtrip wrapper developed by the [BrainModulation Lab](https://www.brainmodulationlab.org/).
 
 You need to manually download and include (only the main folder!) them in your MATLAB dependencies.
 After that just run these commands in MATLAB to manage dependencies:
