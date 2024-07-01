@@ -24,7 +24,7 @@ cd code_SPC_ECoG_STN_Speech
 ## Minimal Dataset 
 
 The minimum dataset required to run the repository can be downloaded in [Zenodo](https://doi.org/10.5281/zenodo.12610957):
-* To run spc_demo.m you need to copy the file SPC_ECoG_STN_Speech/demos/intracranial-data-examples/intracranial_data.mat in code_SPC_ECoG_STN_Speech/demos/intracranial-data-examples
+* To run 'spc_demo.m' you need to copy the file 'SPC_ECoG_STN_Speech/demos/intracranial-data-examples/intracranial_data.mat' in 'code_SPC_ECoG_STN_Speech/demos/intracranial-data-examples'.
 
 
 ## Contributors
