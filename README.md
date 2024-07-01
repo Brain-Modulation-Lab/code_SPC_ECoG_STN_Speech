@@ -5,6 +5,7 @@
 [![Generic badge](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.10494534-orange.svg)](https://doi.org/10.5281/zenodo.12610957)
 ## Introduction
 This repository contains the code and the preprocessed dataset for the preprint [Vissani et al 2024](https://doi.org/10.1101/2023.10.18.562969) "Spike-phase coupling of subthalamic neurons to posterior opercular cortex predicts speech sound accuracy". The full raw dataset is hosted in the [Data Archive BRAIN Initiative](https://dabi.loni.usc.edu/dsi/1U01NS098969) and is available upon request.
+This repository can be used to calculate time-resolved spike-phase coupling in event-based paradigms adapting the width-specific window approach proposed by [Fischer et al](https://elifesciences.org/articles/51956).
 
 Abstract of the paper:
 >Speech provides a rich context for understanding how cortical interactions with the basal ganglia contribute to unique human behaviors, but opportunities for direct intracranial recordings across cortical-basal ganglia networks are rare. We recorded electrocorticographic signals in the cortex synchronously with single units in the basal ganglia during awake neurosurgeries where subjects spoke syllable repetitions. We discovered that individual STN neurons have transient (200ms) spike-phase coupling (SPC) events with multiple cortical regions. The spike timing of STN neurons was coordinated with the phase of theta-alpha oscillations in the posterior supramarginal and superior temporal gyrus during speech planning and production. Speech sound errors occurred when this STN-cortical interaction was delayed. Our results suggest that the STN supports mechanisms of speech planning and auditory-sensorimotor integration during speech production that are required to achieve high fidelity of the phonological and articulatory representation of the target phoneme. These findings establish a framework for understanding cortical-basal ganglia interaction in other human behaviors, and additionally indicate that firing-rate based models are insufficient for explaining basal ganglia circuit behavior.
@@ -48,7 +49,8 @@ The external folder in the repo contains other libraries:
 ## MATLAB Analysis
 
 * DEMO Spike-phase coupling: the script `spc_demo.m` is designed to illustrate the computation of the time-resolved spike-phase coupling between 2 exemplary ECoG channels and 2 exemplary neurons contained in intracranial_data.mat.
-  - The file `set_configs.m` allows to toggle different parameters for the spike-phase coupling computation. Some of these parameters include:
+  - The script `calc_spike_PLV_all.m` is the core function that calculates the spike-phase coupling metric. The pipeline inherits the approach proposed by [Fischer et al](https://elifesciences.org/articles/51956).
+  - The script `set_configs.m` allows to toggle different parameters for the spike-phase coupling computation. Some of these parameters include:
     - `cfg.plv.NUM_PERMS = 500 (recommended)`: number of permutation maps to normalize the spike-phase coupling metric (500 recommended but the computational effort increases a lot, use 80 to have an initial guess)
     - `cfg.locked = true (recommended)`: if true it removes the event-locked component before the computation (true is recommended)
     - `cfg.powertrim = true (recommended)`: if true it removes the most-extreme power events, i.e., pauses (< 10th percentile) and bursts (> 90th percentile) (true is recommended)
