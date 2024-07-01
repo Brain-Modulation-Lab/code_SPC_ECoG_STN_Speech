@@ -48,6 +48,12 @@ The external folder in the repo contains other libraries:
 ## MATLAB Analysis
 
 * DEMO Spike-phase coupling: the script `spc_demo.m` is designed to illustrate the computation of the time-resolved spike-phase coupling between 2 exemplary ECoG channels and 2 exemplary neurons contained in intracranial_data.mat.
+  - The file `set_configs.m` allows to toggle different parameters for the spike-phase coupling computation. Some of these parameters include:
+    - `cfg.plv.NUM_PERMS = 500 (recommended)`: number of permutation maps to normalize the spike-phase coupling metric (500 recommended but the computational effort increases a lot, use 80 to have an initial guess)
+    - `cfg.locked = true (recommended)`: if true it removes the event-locked component before the computation (true is recommended)
+    - `cfg.powertrim = true (recommended)`: if true it removes the most-extreme power events, i.e., pauses (< 10th percentile) and bursts (> 90th percentile) (true is recommended)
+    - `cfg.plv.MIN_TRIALS = 10 (recommended at least)`: number of minimum set of required trials
+
 * MAIN ANALYSIS: `Figure_02.m, Figure_03.m, Figure_04.m and Figure_05.m` are designed to analyze the minimal dataset and to reproduce  figures & metrics noted in the manuscript.
   - `Figure_02.m`: This figure describes the properties of the spike-phase coupling interaction between Subthalamic Nucleus and Cortex during speech production. To reduce computational effort, please make sure that the folder permutation_avgmaps is in your data folder. (~20 min)
   - `Figure_03.m`: This figure describes the spatial distribution of the spike-phase coupling on the Cortex. (~10 min)
