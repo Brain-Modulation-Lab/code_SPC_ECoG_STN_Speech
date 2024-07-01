@@ -27,7 +27,19 @@ The minimum dataset `SPC_ECoG_STN_Speech` required to run the repository can be 
 * To run `spc_demo.m` you need to copy the file `SPC_ECoG_STN_Speech/demos/intracranial-data-examples/intracranial_data.mat` in `code_SPC_ECoG_STN_Speech/demos/intracranial-data-examples`.
 * To run the figures of the manuscript you need to copy the content of the folder `SPC_ECoG_STN_Speech/data` in `code_SPC_ECoG_STN_Speech/data`.
   
+## External dependencies
 
+The code depends on these repositories:
+```
+[fieldtrip](https://www.fieldtriptoolbox.org/): toolbox to analyze electrophysiological data
+[bml](https://github.com/Brain-Modulation-Lab/bml): fieldtrip wrapper developed by the BrainModulation Lab.
+```
+You need to manually download and include (only the main folder!) them in your MATLAB dependencies.
+After that just run these commands in MATLAB to manage dependencies:
+```
+bml_defaults
+ft_defaults
+```
 
 ## Contributors
 * [Matteo Vissani](mailto:mvissani@mgh.harvard.edu)
