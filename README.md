@@ -31,7 +31,7 @@ The minimum dataset `SPC_ECoG_STN_Speech` required to run the repository can be 
   - `DB_error_analysis.mat` contains the results of the spike-phase coupling computation in the error analysis.
   - `DISTAL_atlas.mat` contains the meshes for the visualization of the Subthalamic Nucleus as depicted by the [DISTAL](https://doi.org/10.1016/j.neuroimage.2017.05.015) atlas.
   - `Cortex_MNI.mat` contains the meshes for the visualization of the Cortex. ROIs are parcellated using the [Destrieux](https://surfer.nmr.mgh.harvard.edu/fswiki/CorticalParcellation) atlas.
-  - `permutation_avgmaps` is a folder that contains pre-computed permutation tests. Using this set of permutations can accelerate the run of the code.
+  - `permutation_avgmaps` is a folder that contains pre-computed permutation tests. Using this set of permutations to significantly speed up the code.
   - `tSPC_density_ECoG.txt` contains the spatial density of the spike-phase coupling on the Cortex. Alternatively, the `.node` version can be used to plot the results using [SurfIce](https://www.nitrc.org/projects/surfice/).
   - `tSPC_density_STN.csv` contains the spatial density of the spike-phase coupling on the Subthalamic Nucleus.
 
