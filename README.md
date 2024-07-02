@@ -26,8 +26,15 @@ cd code_SPC_ECoG_STN_Speech
 
 The minimum dataset `SPC_ECoG_STN_Speech` required to run the repository can be downloaded in [Zenodo](https://doi.org/10.5281/zenodo.12610957):
 * To run `spc_demo.m` you need to copy the file `SPC_ECoG_STN_Speech/demos/intracranial-data-examples/intracranial_data.mat` in `code_SPC_ECoG_STN_Speech/demos/intracranial-data-examples`.
-* To run the figures of the manuscript you need to copy the content of the folder `SPC_ECoG_STN_Speech/data` in `code_SPC_ECoG_STN_Speech/data`.
-  
+* To run the figures of the manuscript you need to copy the content of the folder `SPC_ECoG_STN_Speech/data` in `code_SPC_ECoG_STN_Speech/data`:
+  - `DB_main_analysis.mat` contains the results of the spike-phase coupling computation in the main analysis. It contains the description of the ECoG and neuron pairs and the features of the identified spike-phase coupling events.
+  - `DB_error_analysis.mat` contains the results of the spike-phase coupling computation in the error analysis.
+  - `DISTAL_atlas.mat` contains the meshes for the visualization of the Subthalamic Nucleus as depicted by the [DISTAL](https://doi.org/10.1016/j.neuroimage.2017.05.015) atlas.
+  - `Cortex_MNI.mat` contains the meshes for the visualization of the Cortex. ROIs are parcellated using the [Destrieux](https://surfer.nmr.mgh.harvard.edu/fswiki/CorticalParcellation) atlas.
+  - `permutation_avgmaps` is a folder that contains pre-computed permutation tests. Using this set of permutations can accelerate the run of the code.
+  - `tSPC_density_ECoG.txt` contains the spatial density of the spike-phase coupling on the Cortex. Alternatively, the `.node` version can be used to plot the results using [SurfIce](https://www.nitrc.org/projects/surfice/).
+  - `tSPC_density_STN.csv` contains the spatial density of the spike-phase coupling on the Subthalamic Nucleus.
+
 ## External dependencies
 
 The code depends on these repositories:
