@@ -70,6 +70,8 @@ This repository has been tested successfully in MATLAB versions 2022a and 2023a 
 
 >Citation: [INSERT DOI HERE]
 
+## Full Dataset request
+The full raw dataset is hosted in the [Data Archive BRAIN Initiative](https://dabi.loni.usc.edu/dsi/1U01NS098969) and is available upon request.
 
 ## Funding
 This work was funded by the National Institute of Health (BRAIN Initiative), through grants U01NS098969, U01NS117836 and R01NS110424.
