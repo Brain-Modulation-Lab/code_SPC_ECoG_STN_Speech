@@ -48,7 +48,7 @@ The external folder in the repo contains other libraries:
 
 ## MATLAB Analysis
 
-* DEMO Spike-phase coupling: the script `spc_demo.m` is designed to illustrate the computation of the time-resolved spike-phase coupling between 2 exemplary ECoG channels and 2 exemplary neurons contained in intracranial_data.mat.
+* DEMO SPIKE-PHASE COUPLING: the script `spc_demo.m` is designed to illustrate the computation of the time-resolved spike-phase coupling between 2 exemplary ECoG channels and 2 exemplary neurons contained in intracranial_data.mat.
   - The script `calc_spike_PLV_all.m` is the core function that calculates the spike-phase coupling metric. The pipeline inherits the approach proposed by [Fischer et al](https://elifesciences.org/articles/51956).
   - The script `set_configs.m` allows to toggle different parameters for the spike-phase coupling computation. Some of these parameters include:
     - `cfg.plv.NUM_PERMS = 500 (recommended)`: number of permutation maps to normalize the spike-phase coupling metric (500 recommended but the computational effort increases a lot, use 80 to have an initial guess)
