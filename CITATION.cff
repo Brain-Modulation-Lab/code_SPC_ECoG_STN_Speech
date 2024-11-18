@@ -1,0 +1,18 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: Vissani
+  given-names: Matteo
+  orcid: https://orcid.org/0000-0002-3908-7620
+  affiliation: Massachusetts General Hospital - Harvard Medical School 
+title:Brain-Modulation-Lab/code_SPC_ECoG_STN_Speech: Zenodo version
+version: v1.0.1
+date-released: 2024-10-10
+doi: "10.5281/zenodo.13914579"
+url: "https://github.com/Brain-Modulation-Lab/code_SPC_ECoG_STN_Speech"
+keywords: 
+  - ECoG
+  - STN
+  - Speech
+  - Parkinson's Disease
+  - Spike-phase coupling
