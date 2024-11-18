@@ -220,6 +220,8 @@ if nargout > 1
         dist = dist(idx+csvar);
     end
 
+    
+
     % Compute p-value & CI
     switch arg.tail
         case 'both'

@@ -1,0 +1,536 @@
+% This code analyzes additional things to reply the main points raised by
+% Reviewer 3
+
+
+clc
+clear all
+close all
+
+% Define paths for script, data, and output
+script_folder = pwd;  % Current folder of the script
+[parentFolder,~,~] = fileparts(script_folder);
+
+
+
+% Define paths for source scripts and data files
+PATH_SPC = fullfile(parentFolder,'src');  % Path to source folder
+PATH_DATA = fullfile(parentFolder,'data');  % Path to source folder
+PATH_DB = fullfile(PATH_DATA,'DB_main_analysis.mat');  % Path to source folder
+
+% Add source path and its subdirectories to the search path
+addpath(genpath(PATH_SPC))
+
+% initialize libraries
+bml_defaults;
+ft_defaults;
+
+% make plot prettier
+prettify_plots;
+
+% define frequency bands
+bands = bml_get_canonical_bands([0,150]);
+bands.fmid = sqrt(bands.fstarts .* bands.fends);
+newcolor = {'#d7191c', '#fdae61','#fecc5c','#abdda4','#2b83ba'};
+bands.color(2:6) = newcolor;
+nPerms = 1000; 
+
+
+% Define your participant list
+SUBJECTS = {'DBS3001','DBS3002','DBS3003','DBS3004','DBS3005','DBS3008', 'DBS3010', 'DBS3011', ...
+    'DBS3012', 'DBS3014', 'DBS3015', 'DBS3017', 'DBS3018', 'DBS3019', 'DBS3020', 'DBS3022', ...
+    'DBS3023', 'DBS3024', 'DBS3026', 'DBS3027', 'DBS3028', 'DBS3029', 'DBS3030', 'DBS3031', ...
+    'DBS3032'};
+
+
+% Step 1. gather all SPC (pairs & clusters) information
+load(PATH_DB,'DB')
+cfg = set_configs('default');
+
+% load DISTAL atlas
+load(fullfile(PATH_DATA, "DISTAL_atlas.mat"));    
+
+
+%% Show t-map for OnlySign and Top (which_pairs)
+% Step 2. Get times of events
+EvtTimes = get_EvtTimes(DB.Pairs);
+
+% Step 3. Extract SPC maps ('This takes a while')
+Evt_lock = 'Speech'; % or Cue
+which_pairs = 'Top'; % or 'OnlySign', 'Top'
+which_var = 'PPCz';
+Tres = 0.05; % resolution of map
+T = [-2.5 2]; % rnage of time interval
+nPerms = 500; % number of permutation
+
+cfg.stat_test = 'baseline-test'; % can be 'paired-test-conds' (use this if you want to comapre two conditions), 'baseline-test'
+cfg.Filestats = fullfile(PATH_DATA,'permutation_avgmaps',[which_var,'Stat_pairs-',which_pairs,'_evt-',Evt_lock,'_nperm-',num2str(nPerms),'.mat']); % use the pre=saved permutaiton because they take long time!
+%cfg.Baseline = [-Inf EvtTimes.Speech(2)];
+
+SPCmap = get_SPCmap(DB.Pairs,which_var, T, ...
+    Tres,cfg,Evt_lock,which_pairs,nPerms);
+
+% Panel Figure 2A: Plot average SPC maps
+cfg_fh = struct();
+cfg_fh.Position = [300 300 700 500];
+cfg_fh.EvtTimes = EvtTimes.Speech;
+cfg_fh.EvtTypes = cfg.plot.EvtTypes;
+cfg_fh.CLim = {[0 0.7],[-4 4]};
+cfg_fh.CMap = linspecer;
+cfg_fh.NClustplot = 15;
+fhA = plotter_SPCmap(SPCmap, cfg_fh);
+
+%% Show how the SPC method works ["remove permutation test otherwise it might take a while"]
+
+% run spc on demos data
+PATH_DATASOURCE = fullfile(parentFolder ,'demos','intracranial-data-examples','intracranial_data.mat');
+load(PATH_DATASOURCE)
+
+cfg_d = cfg;
+cfg_d.plv.NUM_PERMS = 0;
+
+% Compute Phase Locking Value (PLV)
+PLV = calc_spike_PLV_all(E, S, cfg_d);  % Main function for PLV calculation (it might take a while)
+
+% do plot that shows the width-variable SPC method
+which_ECoG = "ecog_101";
+which_neuron = "Unit5";
+
+% extract neuron timestamps and PLV
+%sess_neuron = unique(S.epochs{strcmpi(S.label,which_neuron)}.session_id_coding);
+%offTime = E.time{sess_neuron}(1);
+%spikeTimes = S.timestamp{strcmpi(S.label,which_neuron)} + offTime;
+PLV_pair = PLV(strcmpi({PLV.S_channel},which_neuron) & strcmpi({PLV.E_channel},which_ECoG));
+
+% extract windows information
+winHalfWidths = PLV_pair.store.all.winHalfWidths/E.fsample;
+winCenters = PLV_pair.winCenters;
+winAnchors = PLV_pair.centerEvts; %[-0.75 before cue onset, cue_onset, cue_offset, speech onset, speech_offset, +0.75 afetr speech offset]
+
+winToShow = [winAnchors+10; winAnchors-10]; winToShow = winToShow(winToShow > 1 & winToShow < numel(winHalfWidths));
+time = winCenters - winCenters(:,winAnchors(4)); % 4 is for speech onset
+Evts = nan(size(winCenters,1),numel(winAnchors));
+for ev = 1 : numel(winAnchors)
+    Evts(:,ev)= winCenters(:,winAnchors(ev)) - winCenters(:,winAnchors(4));
+end
+
+figure
+scatter(Evts, repmat([1:size(winCenters,1)]',1,numel(winAnchors)),'filled')
+ylim([0.5 20.5])
+hold on
+scatter(time(:, winToShow), repmat([1:size(winCenters,1)]',1,numel(winToShow)),15,[.4 .4 .4],'filled')
+for win = 1 : numel(winToShow)
+    plot([time(:, winToShow(win))  + [-winHalfWidths(winToShow(win)) winHalfWidths(winToShow(win))]]', repmat([1:size(winCenters,1)],2,1),'color',[.4 .4 .4])
+end
+xlim([-3 2.5])
+ylabel("Trial id [#] ")
+xlabel("Time after speech onset")
+xticks(median(Evts))
+xticklabels({"ITI","AC Onset","AC Offset","SP Onset","SP Offset", "After SP"})
+
+% %% Check relationship bewteen firing rate change and SPC change
+%
+% SPCDensityUnits = readtable("/Volumes/Nexus4/Users/MV1019/PhaseLocking/FiguresPaper/Figure3/Output/Results/default/SPCDensity_units.txt");
+%
+% BetaDesynch = SPCDensityUnits.beta_speech - SPCDensityUnits.beta_ITI;
+% ThetaAlphaSynch = SPCDensityUnits.thetaalpha_speech - SPCDensityUnits.thetaalpha_ITI;
+% BetaRebound = SPCDensityUnits.beta_postspeech - SPCDensityUnits.beta_ITI;
+%
+% fh = figure('Position',[200 200 800 400]);
+% tcl = tiledlayout(1,2);
+% nexttile
+% scatter( SPCDensityUnits.FRzscore,BetaDesynch,'k','filled')
+%
+% hold on
+% ylabel('beta desynch t-SPC density change (rest - speech)')
+% xlabel('IFR change (z-score w.r.t. rest) [spks/s]')
+% ylim([-11 53])
+% axfh.Parent=tcl;
+% axfh.Layout.Tile=2;
+%
+%
+% %%
+% ClusterSubjects_unittype = arrayfun(@(x) ClusterSubjects(ClusterS_FRMod == x), unit_types,'UniformOutput',false);
+% ClusterSChannel_unittype = arrayfun(@(x) ClusterSChannel(ClusterS_FRMod == x), unit_types,'UniformOutput',false);
+% SignTask_id_unittype = arrayfun(@(x) SignTask_id(:,ClusterS_FRMod == x), unit_types,'UniformOutput',false);
+%
+% PairSubjects_unittype = arrayfun(@(x) PairsLocation_MNI_all.subj_id(Unit_FRmod == x), unit_types,'UniformOutput',false);
+% PairSChannel_unittype = arrayfun(@(x) PairsLocation_MNI_all.S_channel(Unit_FRmod == x), unit_types,'UniformOutput',false);
+
+
+
+%% apply Tmax correction Figure S9
+
+% extract Cluster properties
+cfg.VarFields = {'ClusterCentroid','ClusterEAtlasLabel','ClusterDur'};
+[ClusterCentroid,ClusterEAtlasLabel,ClusterDur] = get_SPCClustersProperties(cfg,DB.Clusters);
+
+
+% (Figure S9:compare t-SPC duration and frequency across ROIs cortex)
+[ROI_AtlasLabels,ROI_nPairs]  = getROIs(DB.Pairs.Location.E_atlas_label_Destrieux, cellstr(DB.Pairs.Location.subj_id), 7,100,1);
+% remove some areas like MTG, pars. O trian and STG plan
+ROI_AtlasLabels(end-2:end) = [];
+ROI_nPairs(end-2:end) = [];
+
+% check duration
+disp("Compare t-SPC duration across ROIs:")
+ROI_ClustDur = cellfun(@(x) ClusterDur(strcmpi(ClusterEAtlasLabel, x))', ROI_AtlasLabels, 'uni', false);
+permuttest2_unbalanced_tmax(ROI_ClustDur, nPerms, ROI_AtlasLabels);
+
+disp("Compare t-SPC frequency across ROIs:")
+ROI_ClustFreq = cellfun(@(x) ClusterCentroid(strcmpi(ClusterEAtlasLabel, x),2), ROI_AtlasLabels, 'uni', false);
+permuttest2_unbalanced_tmax(ROI_ClustFreq, nPerms, ROI_AtlasLabels);
+
+%% apply Tmax correction Figure S11
+
+%Set target here:
+target = {'STN'};
+faceColors = {'#F7B05B'};
+faceAlphas = .6;
+radius = 0.2;
+
+atlas_names = cellfun(@(x) x.name, atlases.roi, 'UniformOutput', false);
+[~,atlas_idx] = ismember(target, atlas_names);
+assert(any(~isempty(atlas_idx)),"No target in this atlas. Change the Atlas!");
+
+
+faces_lh = arrayfun(@(x) atlases.roi{x,2}.fv.faces,atlas_idx,'UniformOutput',false);
+vertices_lh = arrayfun(@(x) atlases.roi{x,2}.fv.vertices,atlas_idx,'UniformOutput',false);
+
+% STN PC
+STN_vx = vertices_lh{1};
+STN_centre = mean(STN_vx);
+% extract Cluster properties
+cfg.VarFields = {'ClusterCentroidBand','ClusterS_MNI'};
+[ClusterCentroidBand,ClusterS_MNI] = get_SPCClustersProperties(cfg,DB.Clusters);
+
+
+% group MNI coords by frequency band
+XCoords = cell(1,5);
+YCoords = cell(1,5);
+ZCoords = cell(1,5);
+for fi = 2:6
+    XCoords{fi - 1} = ClusterS_MNI(ClusterCentroidBand == fi,1) - STN_centre(1);
+    YCoords{fi - 1} = ClusterS_MNI(ClusterCentroidBand == fi,2) - STN_centre(2);
+    ZCoords{fi - 1} = ClusterS_MNI(ClusterCentroidBand == fi,3) - STN_centre(3);
+    
+end
+
+
+disp("Compare t-SPC MNI location in STN across frequencies bands:")
+disp("X coordinate -")
+permuttest2_unbalanced_tmax(XCoords, nPerms, bands.name(2:end)');
+disp("Y coordinate -")
+permuttest2_unbalanced_tmax(YCoords, nPerms, bands.name(2:end)');
+disp("Z coordinate -")
+permuttest2_unbalanced_tmax(ZCoords, nPerms, bands.name(2:end)');
+
+% calculate PC axes
+[coeff,score,latent] = pca(zscore(STN_vx));
+% Project STN MNI to PC axes
+PC_coords = nan(height(ClusterS_MNI),3);
+for ii = 1 : height(ClusterS_MNI)
+    PC_coords(ii,:) = (ClusterS_MNI(ii,:) - mean(STN_vx))./std(STN_vx)*coeff.*std(STN_vx);
+end
+
+% group PC coords by frequency band
+PC1Coords = cell(1,5);
+PC2Coords = cell(1,5);
+PC3Coords = cell(1,5);
+for fi = 2:6
+    PC1Coords{fi - 1} = PC_coords(ClusterCentroidBand == fi,1);
+    PC2Coords{fi - 1} = PC_coords(ClusterCentroidBand == fi,2);
+    PC3Coords{fi - 1} = PC_coords(ClusterCentroidBand == fi,3);  
+end
+
+disp("Compare t-SPC PC location in STN across frequencies bands:")
+disp("PC1 coordinate -")
+permuttest2_unbalanced_tmax(PC1Coords, nPerms, bands.name(2:end)');
+disp("PC2 coordinate -")
+permuttest2_unbalanced_tmax(PC2Coords, nPerms, bands.name(2:end)');
+disp("PC3 coordinate -")
+permuttest2_unbalanced_tmax(PC3Coords, nPerms, bands.name(2:end)');
+
+%% apply Tmax correction Figure S15
+UnitOfInt = [-1 0 1 2];
+UnitLabel = {'D','N','I','M'};
+PairType = arrayfun(@(x) DB.Pairs.Location([DB.Pairs.Location.S_typeFRmod] == x,:), UnitOfInt,'uni',false);
+
+
+cfg.VarFields = {'ClusterS_FRMod'};
+[ClusterS_FRMod] = get_SPCClustersProperties(cfg,DB.Clusters);
+
+% 
+ClusterDur_UnitType = cell(1, numel(UnitOfInt));
+ClusterFreq_UnitType = cell(1, numel(UnitOfInt));
+for ui = 1 : numel(UnitOfInt)
+    ClusterDur_UnitType{ui} = ClusterDur(ClusterS_FRMod == UnitOfInt(ui))';
+    ClusterFreq_UnitType{ui} = ClusterCentroid(ClusterS_FRMod == UnitOfInt(ui),2);
+    
+end
+disp("Compare t-SPC duration across unit types:")
+permuttest2_unbalanced_tmax(ClusterDur_UnitType, nPerms, UnitLabel);
+disp("Compare t-SPC frequency across unit types:")
+permuttest2_unbalanced_tmax(ClusterFreq_UnitType, nPerms, UnitLabel);
+
+%% Apply Tmax correction for Figure S8
+nperms = 1000;
+cfg.VarFields = {'ClusterCentroidBand','ClusterE_MNI'};
+[ClusterCentroidBand,ClusterE_MNI] = get_SPCClustersProperties(cfg,DB.Clusters);
+
+figure('position',[200 200 1800 300]);
+tiledlayout(1,5)
+zperm_dist_clust = nan(nperms,5);
+ztrue_dist_clust = nan(1,5);
+for fi = 1:5
+    coords = ClusterE_MNI(ClusterCentroidBand == fi+1,:);
+    true_dist_clust = mean(vecnorm(coords - mean(coords,'omitnan'),2,2),'omitnan'); % mm
+    perm_dist_clust = nan(1,nperms);
+    for perm_i = 1 : nperms
+        perm_loc = ClusterE_MNI(randi(height(ClusterE_MNI),1,size(coords,1)),:);
+        perm_dist_clust(perm_i) = mean(vecnorm(perm_loc - mean(perm_loc,'omitnan'),2,2),'omitnan'); % mm
+    end
+
+    zperm_dist_clust(:,fi) = (perm_dist_clust - mean(perm_dist_clust))/std(perm_dist_clust);
+    ztrue_dist_clust(fi) = (true_dist_clust - mean(perm_dist_clust))/std(perm_dist_clust);
+end
+
+[~,idx_zmax_dist_clust] = max(abs(zperm_dist_clust),[],2);
+zmax_dist_clust = nan(1,nperms);
+for perm_i = 1 : nperms
+    zmax_dist_clust(perm_i) =   zperm_dist_clust(idx_zmax_dist_clust(perm_i));
+end
+
+
+for fi = 1:5
+    nexttile
+    histogram(zmax_dist_clust,round(sqrt(nperms)),'FaceColor',[.8 ,.8 ,.8])
+    hold on
+    box off
+    xlabel('Distance to centre [mm]')
+    ylabel(' # observations ')
+    %xlim([0 30])
+    if ztrue_dist_clust(fi) > min(zmax_dist_clust)
+        p_val = (sum((zmax_dist_clust - mean(zmax_dist_clust)) <= (ztrue_dist_clust(fi) - mean(zmax_dist_clust)))+1) / (nperms+1); %V2 from Ernst, Permutation Methods: A Basis for Exact Inference, 2004
+    else
+        p_val = 1/nperms;
+    end
+     xline(ztrue_dist_clust(fi),'label',{sprintf('p = %1.3f',p_val)},'Color','r','linewidth',1.4,'LabelOrientation','horizontal','FontSize',15)
+     fprintf("P-val (T-max) %s vs %s null: obs-T = %1.4f [t], p = %1.3f \n", bands.name{fi+1}, bands.name{fi+1}, ztrue_dist_clust(fi), p_val);
+%     nexttile
+%     histogram(perm_dist_clust,round(sqrt(nperms)),'FaceColor',[.8 ,.8 ,.8])
+%     hold on
+%     box off
+%     xlabel('Distance to centre [mm]')
+%     ylabel(' # observations ')
+%     xlim([0 30])
+%     if true_dist_clust > min(perm_dist_clust)
+%         p_val = (sum((perm_dist_clust - mean(perm_dist_clust)) <= (true_dist_clust - mean(perm_dist_clust)))+1) / (nperms+1); %V2 from Ernst, Permutation Methods: A Basis for Exact Inference, 2004
+%     else
+%         p_val = 1/nperms;
+%     end
+%     xline(true_dist_clust,'label',{sprintf('p = %1.3f',p_val)},'Color','r','linewidth',1.4,'LabelOrientation','horizontal','FontSize',15)
+end
+
+
+%% Apply Tmax correction for Figure S10
+nperms = 1000;
+cfg.VarFields = {'ClusterCentroidBand','ClusterS_MNI'};
+[ClusterCentroidBand,ClusterS_MNI] = get_SPCClustersProperties(cfg,DB.Clusters);
+
+figure('position',[200 200 1800 300]);
+tiledlayout(1,5)
+zperm_dist_clust = nan(nperms,5);
+ztrue_dist_clust = nan(1,5);
+for fi = 1:5
+    coords = ClusterS_MNI(ClusterCentroidBand == fi+1,:);
+    true_dist_clust = mean(vecnorm(coords - mean(coords,'omitnan'),2,2),'omitnan'); % mm
+    perm_dist_clust = nan(1,nperms);
+    for perm_i = 1 : nperms
+        perm_loc = ClusterS_MNI(randi(height(ClusterS_MNI),1,size(coords,1)),:);
+        perm_dist_clust(perm_i) = mean(vecnorm(perm_loc - mean(perm_loc,'omitnan'),2,2),'omitnan'); % mm
+    end
+
+    zperm_dist_clust(:,fi) = (perm_dist_clust - mean(perm_dist_clust))/std(perm_dist_clust);
+    ztrue_dist_clust(fi) = (true_dist_clust - mean(perm_dist_clust))/std(perm_dist_clust);
+end
+
+[~,idx_zmax_dist_clust] = max(abs(zperm_dist_clust),[],2);
+zmax_dist_clust = nan(1,nperms);
+for perm_i = 1 : nperms
+    zmax_dist_clust(perm_i) =   zperm_dist_clust(idx_zmax_dist_clust(perm_i));
+end
+
+
+for fi = 1:5
+    nexttile
+    histogram(zmax_dist_clust,round(sqrt(nperms)),'FaceColor',[.8 ,.8 ,.8])
+    hold on
+    box off
+    xlabel('Distance to centre [mm]')
+    ylabel(' # observations ')
+    %xlim([0 30])
+    if ztrue_dist_clust(fi) > min(zmax_dist_clust)
+        p_val = (sum((zmax_dist_clust - mean(zmax_dist_clust)) <= (ztrue_dist_clust(fi) - mean(zmax_dist_clust)))+1) / (nperms+1); %V2 from Ernst, Permutation Methods: A Basis for Exact Inference, 2004
+    else
+        p_val = 1/nperms;
+    end
+     xline(ztrue_dist_clust(fi),'label',{sprintf('p = %1.3f',p_val)},'Color','r','linewidth',1.4,'LabelOrientation','horizontal','FontSize',15)
+     fprintf("P-val (T-max) %s vs %s null: obs-T = %1.4f [t], p = %1.3f \n", bands.name{fi+1}, bands.name{fi+1}, ztrue_dist_clust(fi), p_val);
+%     nexttile
+%     histogram(perm_dist_clust,round(sqrt(nperms)),'FaceColor',[.8 ,.8 ,.8])
+%     hold on
+%     box off
+%     xlabel('Distance to centre [mm]')
+%     ylabel(' # observations ')
+%     xlim([0 30])
+%     if true_dist_clust > min(perm_dist_clust)
+%         p_val = (sum((perm_dist_clust - mean(perm_dist_clust)) <= (true_dist_clust - mean(perm_dist_clust)))+1) / (nperms+1); %V2 from Ernst, Permutation Methods: A Basis for Exact Inference, 2004
+%     else
+%         p_val = 1/nperms;
+%     end
+%     xline(true_dist_clust,'label',{sprintf('p = %1.3f',p_val)},'Color','r','linewidth',1.4,'LabelOrientation','horizontal','FontSize',15)
+end
+
+%% apply t-max correction for figure 3A
+
+
+cfg.VarFields = {'ClusterEAtlasLabel'};
+ClusterEAtlasLabel = get_SPCClustersProperties(cfg,DB.Clusters);
+
+% density
+ROI_nClusters = cellfun(@(x)sum(strcmpi(ClusterEAtlasLabel,x)),ROI_AtlasLabels);
+ROI_SPCdensity = ROI_nClusters./ROI_nPairs*100;
+
+
+% need build permutation
+% ROI_SPCdensity_perm_5pth = nan(1,numel(ROI_AtlasLabels));
+% ROI_SPCdensity_perm_50pth = nan(1,numel(ROI_AtlasLabels));
+% ROI_SPCdensity_perm_95pth = nan(1,numel(ROI_AtlasLabels));
+zperm_SPCDensity_clust = nan(nperms,numel(ROI_AtlasLabels));
+ztrue_SPCDensity_clust = nan(1,numel(ROI_AtlasLabels));
+for roi_i = 1 : numel(ROI_AtlasLabels)
+    ROI_SPCdensity_perm = nan(1,nperms);
+
+    for perm_i = 1 : nperms
+        tmp = DB.Pairs.Location.nSign(randperm(height(DB.Pairs.Location), ROI_nPairs(roi_i)));
+        ROI_SPCdensity_perm(perm_i) = mean(tmp)*100;
+    end
+%     ROI_SPCdensity_perm_5pth(roi_i) = prctile(ROI_SPCdensity_perm{roi_i},5);
+%     ROI_SPCdensity_perm_50pth(roi_i) = prctile(ROI_SPCdensity_perm{roi_i},50);
+%     ROI_SPCdensity_perm_95pth(roi_i) = prctile(ROI_SPCdensity_perm{roi_i},95);
+%     
+    zperm_SPCDensity_clust(:,roi_i) = (ROI_SPCdensity_perm - mean(ROI_SPCdensity_perm))/std(ROI_SPCdensity_perm);
+    ztrue_SPCDensity_clust(roi_i) = (ROI_SPCdensity(roi_i) - mean(ROI_SPCdensity_perm))/std(ROI_SPCdensity_perm);
+end
+
+[~,idx_zmax_SPCDensity_clust] = max(abs(zperm_SPCDensity_clust),[],2);
+zmax_SPCDensity_clust = nan(1,nperms);
+for perm_i = 1 : nperms
+    zmax_SPCDensity_clust(perm_i) =   zperm_SPCDensity_clust(idx_zmax_SPCDensity_clust(perm_i));
+end
+for roi_i = 1 : numel(ROI_AtlasLabels)
+        p_val = (sum(abs((zmax_SPCDensity_clust - mean(zmax_SPCDensity_clust))) >= abs((ztrue_SPCDensity_clust(roi_i) - mean(zmax_SPCDensity_clust))))+1) / (nperms+1); %V2 from Ernst, Permutation Methods: A Basis for Exact Inference, 2004
+
+         fprintf("P-val (T-max) %s vs %s null: obs-T = %1.4f [t], p = %1.3f \n", ROI_AtlasLabels{roi_i}, ROI_AtlasLabels{roi_i}, ztrue_SPCDensity_clust(roi_i), p_val);
+
+     %xline(ztrue_SPCDensity_clust(fi),'label',{sprintf('p = %1.3f',p_val)},'Color','r','linewidth',1.4,'LabelOrientation','horizontal','FontSize',15)
+end
+
+% figure('position',[200 200 400 400]); % density
+% bar(1:numel(ROI_AtlasLabels),ROI_SPCdensity)
+% xticks(1:numel(ROI_AtlasLabels))
+% hold on
+% plot(1:numel(ROI_AtlasLabels),ROI_SPCdensity_perm_5pth,'o')
+% plot(1:numel(ROI_AtlasLabels),ROI_SPCdensity_perm_50pth,'o')
+% plot(1:numel(ROI_AtlasLabels),ROI_SPCdensity_perm_95pth,'o')
+% 
+% xticklabels(ROI_AtlasLabels)
+% ylabel('t-SPC density')
+% box off
+
+
+
+
+%%
+speech_eval = bml_annot_read_tsv(fullfile(PATH_DATA,"subj-DBS_ses-preop_voice-eval.tsv"));
+speech_eval.subj_id = string(speech_eval.subj_id);
+figure
+nexttile
+scatter(speech_eval.updrs_tot,speech_eval.phon_accuracy,'filled')
+nexttile
+scatter(speech_eval.updrs_tot,speech_eval.cpp_vowel,'filled')
+nexttile
+scatter(speech_eval.updrs_tot,speech_eval.cpppsd_vowel,'filled')
+nexttile
+scatter(speech_eval.updrs_tot,speech_eval.cpp_speech,'filled')
+nexttile
+scatter(speech_eval.updrs_tot,speech_eval.aerobreaths,'filled')
+nexttile
+scatter(speech_eval.updrs_tot,speech_eval.reading_duration,'filled')
+%%
+PATH_DB = fullfile(PATH_DATA,'DB_error_analysis.mat');  % Path to source folder
+
+load(PATH_DB,'DB_acc')
+cfg_fh = [];
+cfg_fh.VarFields = {'ClusterCentroidBand','ClusterOnOff','ClusterSubjects'};
+cfg_fh.bands = [2 3];
+[fh, clust_timing] = compare_ClusterTiming(DB_acc,cfg_fh);
+%%
+clust_timing.Effect_delta = diff(clust_timing.OnOff_all, [], 2);
+clust_timing.speech_eval = nan(numel(clust_timing.Effect_delta),numel(speech_eval.Properties.VariableNames) - 1);  % Initialize the speech_eval table
+
+for part_i = 1:numel(clust_timing.Effect_delta)
+    % Find matching rows
+    match_idx = ismember(speech_eval.subj_id, clust_timing.Pair_info{part_i, 1});
+
+    % Extract the row, ensuring mixed types are preserved
+    if any(match_idx)
+        % Assign the matching row
+        clust_timing.speech_eval(part_i, :) = speech_eval{match_idx, 2:end};
+
+    end
+end
+clust_timing.speech_eval = array2table(clust_timing.speech_eval,"VariableNames",speech_eval.Properties.VariableNames(2:end));
+
+
+figure
+for ii = 2 : numel(clust_timing.speech_eval.Properties.VariableNames)
+    nexttile
+    scatter(clust_timing.OnOff_all(:,1),clust_timing.speech_eval{:,ii},55,'r','filled')
+    %scatter((clust_timing.OnOff_all(:,1) - mean(clust_timing.OnOff_all(:),"omitnan"))/ std(clust_timing.OnOff_all(:),[],"omitnan"),clust_timing.speech_eval{:,ii},55,'r','filled')
+    hold on
+    scatter(clust_timing.OnOff_all(:,2),clust_timing.speech_eval{:,ii},55,'g','filled')
+    %scatter((clust_timing.OnOff_all(:,2) - mean(clust_timing.OnOff_all(:),"omitnan"))/ std(clust_timing.OnOff_all(:),[],"omitnan"),clust_timing.speech_eval{:,ii},55,'g','filled')
+    xlabel("t-SPC onset")
+    [Rho, pRho] = compare_stat_scatterplot(clust_timing.OnOff_all(:,2),clust_timing.speech_eval{:,ii},'corr_sp');
+    title(sprintf("(R = %1.2f, p = %1.3f)",Rho,pRho))
+
+    ylabel(clust_timing.speech_eval.Properties.VariableNames{ii},"Interpreter","none")
+    %xlim([-2.75 2.5])
+end
+
+figure
+for ii = 2 : numel(clust_timing.speech_eval.Properties.VariableNames)
+    nexttile
+    scatter(clust_timing.Off_all(:,1),clust_timing.speech_eval{:,ii},55,'r','filled')
+    %scatter((clust_timing.OnOff_all(:,1) - mean(clust_timing.OnOff_all(:),"omitnan"))/ std(clust_timing.OnOff_all(:),[],"omitnan"),clust_timing.speech_eval{:,ii},55,'r','filled')
+    hold on
+    scatter(clust_timing.Off_all(:,2),clust_timing.speech_eval{:,ii},55,'g','filled')
+    xlabel("t-SPC onset")
+    ylabel(clust_timing.speech_eval.Properties.VariableNames{ii},"Interpreter","none")
+
+    %xlim([-2.75 2.5])
+end
+% figure
+% for ii = 2 : numel(clust_timing.speech_eval.Properties.VariableNames)
+%     nexttile
+%     scatter(clust_timing.Effect_delta(:,1),clust_timing.speech_eval{:,ii},55,'r','filled')
+%     hold on
+%     xlabel("\Delta t-SPC onset")
+%     ylabel(clust_timing.speech_eval.Properties.VariableNames{ii},"Interpreter","none")
+% end
+
+%%
+
+SPCDensityUnits = readtable("Y:/Users/MV1019/PhaseLocking/FiguresPaper/Figure3/Output/Results/default/SPCDensity_units.txt");
+

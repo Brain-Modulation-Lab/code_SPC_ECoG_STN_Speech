@@ -1,4 +1,4 @@
-function fh = compare_ClusterTiming(DB,cfg)
+function [fh, varargout] = compare_ClusterTiming(DB,cfg)
 
 bands = cfg.bands;
 [ClusterCentroidBand_error,ClusterOnOff_error] = get_SPCClustersProperties(cfg, DB.Clusters_error);
@@ -6,6 +6,8 @@ bands = cfg.bands;
 
 cluster_error = (ClusterOnOff_error(ismember(ClusterCentroidBand_error,bands),:));
 cluster_accurate = (ClusterOnOff_accurate(ismember(ClusterCentroidBand_accurate,bands),:));
+%ClusterSubjects_error = ClusterSubjects_error(ismember(ClusterCentroidBand_error,bands));
+%ClusterSubjects_accurate = ClusterSubjects_accurate(ismember(ClusterCentroidBand_accurate,bands));
 
 
 [unique_error,idx_error] = getUniquePairs(DB.Clusters_error);
@@ -17,6 +19,7 @@ idx_accurate = idx_accurate(ismember(ClusterCentroidBand_accurate,[2 3]));
 unique_all = unique([unique_error; unique_accurate],'rows');
 
 OnOff_all = nan(size(unique_all,1),2);
+Off_all = nan(size(unique_all,1),2);
 Duration_all = nan(size(unique_all,1),2);
 Duration_all_pre = nan(size(unique_all,1),2);
 Duration_all_post = nan(size(unique_all,1),2);
@@ -26,9 +29,13 @@ Duration_all_post = nan(size(unique_all,1),2);
 duration_cluster_error = diff(cluster_error,[],2);
 duration_cluster_accurate = diff(cluster_accurate,[],2);
 
+
+
 for u = 1 : size(unique_all,1)
     [~,idx] = ismember(unique_all(u,:),unique_error,'rows');
     OnOff_all(u,1) = mean(cluster_error(idx_error == idx ,1),'omitnan');
+    Off_all(u,1) = mean(cluster_error(idx_error == idx ,2),'omitnan');
+    
     %OnOff_all_std(u,1) = std(meanpoint_cluster_error(idx_error == idx),'omitnan');
     Duration_all(u,1) = mean(duration_cluster_error(idx_error == idx ),'omitnan');
     Duration_all_pre(u,1) = mean(duration_cluster_error(idx_error == idx &  cluster_error(:,1) < 0),'omitnan');
@@ -40,12 +47,21 @@ for u = 1 : size(unique_all,1)
     [~,idx] = ismember(unique_all(u,:),unique_accurate,'rows');
   
     OnOff_all(u,2) = mean(cluster_accurate(idx_accurate == idx ,1),'omitnan');
+    Off_all(u,2) = mean(cluster_accurate(idx_accurate == idx ,2),'omitnan');
+    
     Duration_all(u,2) = mean(duration_cluster_accurate(idx_accurate == idx ),'omitnan');
     %OnOff_all_std(u,2) = std(meanpoint_cluster_accurate(idx_accurate == idx),'omitnan');
     Duration_all_pre(u,2) = mean(duration_cluster_accurate(idx_accurate == idx &  cluster_accurate(:,1) < 0),'omitnan');
     Duration_all_post(u,2) = mean(duration_cluster_accurate(idx_accurate == idx &  cluster_accurate(:,1) >= 0),'omitnan');
     
 end
+
+store = struct();
+store.OnOff_all = OnOff_all;
+store.Off_all = Off_all;
+store.Pair_info = unique_all;
+varargout{1} = store;
+
 
 
 fh{1} = figure('Position',[200 200 300 300]);
